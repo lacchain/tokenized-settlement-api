@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import * as snarkjs from "snarkjs";
+import snarkjs from "snarkjs";
 import circomlib from "circomlib";
 import merkleTree from "cli-tornado/lib/MerkleTree.js";
 import buildGroth16 from "websnark/src/groth16.js";

@@ -1,15 +1,43 @@
-### Deploy a new institution
-POST http://104.154.147.42:8080/deploy
+### Deploy a new institution 1
+POST http://localhost:8080/deploy
 Content-Type: application/json
 
 {
 	"name": "Institution 1",
 	"symbol": "IN1",
-	"initialSupply": 4
+	"initialSupply": 10
 }
 
-### Deposit to a institution
-POST http://localhost:8080/deposit
+### Deploy a new institution 2
+POST http://localhost:8080/deploy
+Content-Type: application/json
+
+{
+	"name": "Institution 2",
+	"symbol": "IN2",
+	"initialSupply": 5
+}
+
+### Connect institution 1 to Institution 2
+POST http://localhost:8080/connect
+Content-Type: application/json
+
+{
+	"indexFrom": 0,
+	"indexTo": 1
+}
+
+### Connect institution 2 to Institution 1
+POST http://localhost:8080/connect
+Content-Type: application/json
+
+{
+	"indexFrom": 1,
+	"indexTo": 0
+}
+
+### Mint to a institution
+POST http://localhost:8080/mint
 Content-Type: application/json
 
 {
@@ -17,11 +45,29 @@ Content-Type: application/json
 	"amount": 2
 }
 
+### Deposit indexFrom to indexTo institution
+POST http://localhost:8080/deposit
+Content-Type: application/json
+
+{
+	"indexFrom": 1,
+	"indexTo": 0,
+	"amount": 1
+}
+
+### Get institution balance
+GET http://localhost:8080/balance
+Content-Type: application/json
+
+{
+	"institutionIndex": 1
+}
 
 ### Withdraw from institution
 POST http://localhost:8080/withdraw
 Content-Type: application/json
 
 {
-	"institutionIndex": 0
+	"institutionIndex": 1,
+	"preimage": "070e9db32952eadc16c11fe595476c579e648794c492b3bfabd5efaaea6c7f2b93dc91204e82755d30f42861e2c65de7d3093820a129e75132b02dbda5dc"
 }
