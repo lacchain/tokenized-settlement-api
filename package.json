@@ -20,6 +20,6 @@
     "winston-elasticsearch": "^0.16.0"
   },
   "scripts": {
-    "start": "--experimental-modules --experimental-json-modules src/app.js"
+    "start": "node --experimental-modules --experimental-json-modules src/app.js"
   }
 }

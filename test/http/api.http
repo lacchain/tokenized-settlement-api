@@ -1,5 +1,5 @@
 ### Deploy a new institution
-POST http://localhost:8080/deploy
+POST http://104.154.147.42:8080/deploy
 Content-Type: application/json
 
 {
