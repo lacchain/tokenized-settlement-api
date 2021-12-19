@@ -1,0 +1,25 @@
+{
+  "name": "tokenized-money-api",
+  "version": "0.1.0",
+  "type": "module",
+  "repository": "git@github.com:lacchain/tokenized-money-api.git",
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.16.0",
+    "@openzeppelin/contracts": "4.1.0",
+    "apply-patch": "0.1.2",
+    "circomlib": "git+https://github.com/tornadocash/circomlib.git#c372f14d324d57339c88451834bf2824e73bbdbc",
+    "cli-tornado": "git+https://github.com/tornadocash/tornado-cli.git#6ce616cbaf5f5a93f0ca76c9e1d28b290772cbf7",
+    "cors": "^2.8.5",
+    "ethereum-waffle": "3.3.0",
+    "ethers": "5.3.0",
+    "express": "^4.17.2",
+    "multer": "^1.4.4",
+    "snarkjs": "git+https://github.com/tornadocash/snarkjs.git#869181cfaf7526fe8972073d31655493a04326d5",
+    "websnark": "git+https://github.com/tornadocash/websnark.git#4c0af6a8b65aabea3c09f377f63c44e7a58afa6d",
+    "winston": "^3.3.3",
+    "winston-elasticsearch": "^0.16.0"
+  },
+  "scripts": {
+    "start": "--experimental-modules --experimental-json-modules src/app.js"
+  }
+}

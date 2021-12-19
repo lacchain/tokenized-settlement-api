@@ -1,0 +1,27 @@
+### Deploy a new institution
+POST http://localhost:8080/deploy
+Content-Type: application/json
+
+{
+	"name": "Institution 1",
+	"symbol": "IN1",
+	"initialSupply": 4
+}
+
+### Deposit to a institution
+POST http://localhost:8080/deposit
+Content-Type: application/json
+
+{
+	"institutionIndex": 0,
+	"amount": 2
+}
+
+
+### Withdraw from institution
+POST http://localhost:8080/withdraw
+Content-Type: application/json
+
+{
+	"institutionIndex": 0
+}
