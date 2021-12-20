@@ -68,6 +68,7 @@ POST http://localhost:8080/withdraw
 Content-Type: application/json
 
 {
-	"institutionIndex": 1,
-	"preimage": "070e9db32952eadc16c11fe595476c579e648794c492b3bfabd5efaaea6c7f2b93dc91204e82755d30f42861e2c65de7d3093820a129e75132b02dbda5dc"
+	"institutionIndex": 0,
+	"preimage": "005b1db8854ff614fc84b049b01c49bb93307a95d246d8e5c271657d3ccab16b966b0842ff06ff4f493a7281d5bc4a6fec536c7cab77ac2a6892c3f59e87",
+	"nullifierHash": "0x10a5779109b41ecfc6f25764ec83ffa7817af866833218cf71d6a01d10c30768"
 }

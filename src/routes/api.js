@@ -4,6 +4,7 @@ import ethers from "ethers";
 import { deployERC20Tornado, generateProof, MERKLE_TREE_HEIGHT, newDeposit } from "../lib/index.js";
 import Router from './router.js';
 import InteroperableTokenJSON from '../contracts/InteroperableToken.json';
+import circuit from '../resources/external/withdraw.json';
 
 const BNfrom = ethers.BigNumber.from;
 const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1", new ethers.providers.JsonRpcProvider( "https://writer.lacchain.net" ) );
@@ -28,8 +29,10 @@ export default class APIRouter extends Router {
 		this.post( '/deploy', async req => {
 			const { name, symbol, initialSupply } = req.body;
 
+			if( isNaN( initialSupply ) ) throw new Error( "initialSupply is not a number" );
+
 			const InteroperableToken = new ethers.ContractFactory( InteroperableTokenJSON.abi, InteroperableTokenJSON.bytecode, operator );
-			const token = await InteroperableToken.deploy( name, symbol, name, initialSupply, operatorAddress, operatorAddress, operatorAddress, operatorAddress, operatorAddress );
+			const token = await InteroperableToken.deploy( name, symbol, name, `0x${initialSupply.toString( 16 )}`, operatorAddress, operatorAddress, operatorAddress, operatorAddress, operatorAddress );
 			await token.deployed();
 
 			const tornado = await deployERC20Tornado( operator, 1, token.address )
@@ -65,10 +68,11 @@ export default class APIRouter extends Router {
 		this.post( '/mint', async req => {
 			const { amount, institutionIndex } = req.body;
 
+			if( isNaN( amount ) ) throw new Error( "amount is not a number" );
 			if( institutionIndex >= institutions.length ) throw new Error( "Invalid Institution index" );
 
 			const institution = institutions[institutionIndex];
-			await institution.token.mint( operatorAddress, amount );
+			await institution.token.mint( operatorAddress, `0x${amount.toString( 'hex' )}` );
 
 			const totalSupply = await institution.token.totalSupply();
 			return {
@@ -79,6 +83,7 @@ export default class APIRouter extends Router {
 		this.post( '/deposit', async req => {
 			const { indexFrom, indexTo, amount } = req.body;
 
+			if( isNaN( amount ) ) throw new Error( "amount is not a number" );
 			if( indexFrom >= institutions.length ) throw new Error( "Invalid indexFrom Institution " );
 			if( indexTo >= institutions.length ) throw new Error( "Invalid indexTo Institution " );
 
@@ -90,7 +95,8 @@ export default class APIRouter extends Router {
 			await institutionFrom.token.burnAndTransferToConnectedInstitution( amount, [amount], [commitmentHex], institutionTo.name );
 
 			return {
-				preimage: deposit.preimage.toString( 'hex' )
+				preimage: deposit.preimage.toString( 'hex' ),
+				nullifierHash: BNfrom( deposit.nullifierHash ).toHexString()
 			}
 		} )
 
@@ -107,12 +113,11 @@ export default class APIRouter extends Router {
 		} );
 
 		this.post( '/withdraw', async req => {
-			const { institutionIndex, preimage } = req.body;
+			const { institutionIndex, preimage, nullifierHash } = req.body;
 
 			if( institutionIndex >= institutions.length ) throw new Error( "Invalid Institution index" );
 			const institution = institutions[institutionIndex];
 			//withdraw from institution tornado contract
-			const circuit = fs.readFileSync( path.resolve() + '/src/resources/external/withdraw.json' );
 			const provingKey = ( await fs.readFileSync( path.resolve() + '/src/resources/external/withdraw_proving_key.bin' ) ).buffer;
 			const depositEvents = ( await institution.tornado.queryFilter( 'Deposit', 34103264 ) ).map( depositArgs => ( {
 				leafIndex: depositArgs.args.leafIndex,
@@ -124,12 +129,11 @@ export default class APIRouter extends Router {
 				proof
 			} = await generateProof( Buffer.from( preimage, 'hex' ), institution.token.address, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
 			const rootHex = BNfrom( root ).toHexString();
-			const nullifierHashHex = BNfrom( deposit.nullifierHash ).toHexString();
 			//checking the receiving address has 0 balance before the withdrawal
 			await institution.tornado.withdraw(
 				proof,
 				rootHex,
-				nullifierHashHex,
+				nullifierHash,
 				institution.token.address,
 				ethers.constants.AddressZero,
 				0,
