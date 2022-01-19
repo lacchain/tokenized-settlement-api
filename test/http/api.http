@@ -1,5 +1,5 @@
 ### Deploy a new institution 1
-POST http://localhost:8080/deploy
+POST http://104.154.147.42:8080/deploy
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### Deploy a new institution 2
-POST http://localhost:8080/deploy
+POST http://104.154.147.42:8080/deploy
 Content-Type: application/json
 
 {
@@ -56,7 +56,7 @@ Content-Type: application/json
 }
 
 ### Get institution balance
-GET http://localhost:8080/balance
+POST http://localhost:8080/balance
 Content-Type: application/json
 
 {
@@ -69,6 +69,6 @@ Content-Type: application/json
 
 {
 	"institutionIndex": 0,
-	"preimage": "005b1db8854ff614fc84b049b01c49bb93307a95d246d8e5c271657d3ccab16b966b0842ff06ff4f493a7281d5bc4a6fec536c7cab77ac2a6892c3f59e87",
-	"nullifierHash": "0x10a5779109b41ecfc6f25764ec83ffa7817af866833218cf71d6a01d10c30768"
+	"preimage": "53ef597dd4fbf748a130ed3df674055227e8771fac5e8a218b7a5ebdce74430bfbbb283a473f1db1d0002d753988ef5a15e59bdedd1d705e058e330913c8",
+	"nullifierHash": "0x2202a1850ff0b89026b77fe5ec8ec99f9451f9c9da6d6af9a34752230c1ea365"
 }

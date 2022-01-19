@@ -100,7 +100,7 @@ export default class APIRouter extends Router {
 			}
 		} )
 
-		this.get( '/balance', async req => {
+		this.post( '/balance', async req => {
 			const { institutionIndex } = req.body;
 
 			if( institutionIndex >= institutions.length ) throw new Error( "Invalid Institution index" );
