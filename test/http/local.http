@@ -1,5 +1,5 @@
 ### Deploy a new institution 1
-POST http://104.154.147.42:8080/deploy
+POST http://localhost:8080/deploy
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### Deploy a new institution 2
-POST http://104.154.147.42:8080/deploy
+POST http://localhost:8080/deploy
 Content-Type: application/json
 
 {
@@ -56,7 +56,7 @@ Content-Type: application/json
 }
 
 ### Get institution balance
-POST http://104.154.147.42:8080/balance
+POST http://localhost:8080/balance
 Content-Type: application/json
 
 {

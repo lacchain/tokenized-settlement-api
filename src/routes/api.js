@@ -106,7 +106,7 @@ export default class APIRouter extends Router {
 			if( institutionIndex >= institutions.length ) throw new Error( "Invalid Institution index" );
 			const institution = institutions[institutionIndex];
 
-			const balance = await institution.token.totalSupply();
+			const balance = await institution.token.balanceOf( '0x4222ec932c5a68b80e71f4ddebb069fa02518b8a' )
 			return {
 				balance: parseInt( balance, 16 )
 			}
