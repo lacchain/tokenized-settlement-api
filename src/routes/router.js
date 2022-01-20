@@ -2,6 +2,7 @@ import express from 'express';
 import Logger from "../utils/logger.js";
 import config from "../config.js";
 import multer from "multer";
+import swaggerUi from "swagger-ui-express";
 
 export default class Router {
 
@@ -14,6 +15,11 @@ export default class Router {
 	init() {
 	}
 
+	swagger( path, document ) {
+		this.router.use( path, swaggerUi.serve );
+		this.router.get( path, swaggerUi.setup( document ) );
+	}
+
 	get( path, ...callbacks ) {
 		this.router.get( path, this._bindCustomResponses, this._getCallbacks( callbacks ) );
 	}
@@ -22,7 +28,7 @@ export default class Router {
 		this.router.post( path, this._bindCustomResponses, this._getCallbacks( callbacks ) );
 	}
 
-	upload( path, filename, ...callbacks ){
+	upload( path, filename, ...callbacks ) {
 		const upload = multer();
 		this.router.post( path, this._bindCustomResponses, upload.single( filename ), this._getCallbacks( callbacks ) );
 	}

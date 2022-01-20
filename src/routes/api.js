@@ -7,6 +7,7 @@ import Router from './router.js';
 import InteroperableTokenJSON from '../contracts/InteroperableToken.json';
 import circuit from '../resources/external/withdraw.json';
 import tornadoJSON from "../contracts/ERC20Tornado.json";
+import swaggerDocument from '../resources/swagger.json';
 
 const BNfrom = ethers.BigNumber.from;
 const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1", new ethers.providers.JsonRpcProvider( "https://writer.lacchain.net" ) );
@@ -28,11 +29,7 @@ export default class APIRouter extends Router {
 
 		await redisClient.connect();
 
-		this.get( '/', async() => {
-			return {
-				version: '1.0'
-			}
-		} );
+		this.swagger( '/', swaggerDocument );
 
 		this.post( '/deploy', async req => {
 			const { name, symbol, initialSupply } = req.body;

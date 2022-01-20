@@ -1,0 +1,305 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "TokenizedMoney API",
+    "description": "Tokenized Money Settlement API"
+  },
+  "host": "104.154.147.42:8080",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "paths": {
+    "/deploy": {
+      "post": {
+        "tags": [
+          "Deploy"
+        ],
+        "summary": "Register a new institution",
+        "description": "Deploy an ERC-20 Interoperable Token and TornadoCash Smart Contract",
+        "operationId": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Institution name, symbol and initial supply",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "default": "Institution 1"
+                },
+                "symbol": {
+                  "type": "string",
+                  "default": "IN1"
+                },
+                "initialSupply": {
+                  "type": "integer",
+                  "default": 10
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "examples": {
+              "application/json": {
+                "name": "Institution 1",
+                "symbol": "IN1",
+                "tokenAddress": "0x9EA8C207F764C789219cd84b0986e5B2480F0deE",
+                "tornadoAddress": "0xE1c90892DC25598B5493869457eFaccf6BA5B4d6",
+                "totalSupply": "10"
+              }
+            }
+          },
+          "500": {
+            "description": "Error"
+          }
+        }
+      }
+    },
+    "/connect": {
+      "post": {
+        "tags": [
+          "Connect"
+        ],
+        "summary": "Connect two institutions",
+        "description": "Allow an institution to interact with another",
+        "operationId": "",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "description": "(from) and (to) institutions addresses",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fromAddress": {
+                  "type": "string",
+                  "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
+                },
+                "toAddress": {
+                  "type": "string",
+                  "default": "0x121A39A5154A5CD852C357D8267928e731F64658"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "examples": {
+              "application/json": true
+            }
+          },
+          "500": {
+            "description": "Error",
+            "examples": {
+              "application/json": false
+            }
+          }
+        }
+      }
+    },
+    "/balance/{token}/{account}": {
+      "get": {
+        "tags": [
+          "Balance"
+        ],
+        "summary": "Get balance of an account",
+        "description": "Get the account balance in the token",
+        "operationId": "",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "description": "InteroperableToken Address",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
+          },
+          {
+            "name": "account",
+            "description": "Account Address",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "0x4222ec932c5a68b80e71f4ddebb069fa02518b8a"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status",
+            "examples": {
+              "application/json": {
+                "balance": 10
+              }
+            }
+          },
+          "500": {
+            "description": "Invalid account or institution address"
+          }
+        }
+      }
+    },
+    "/transfer": {
+      "post": {
+        "tags": [
+          "Transfer"
+        ],
+        "summary": "Transfer tokens between institutions",
+        "description": "Generate a ZKP transfer operation",
+        "operationId": "",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "description": "from and to address contract, amount",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fromAddress": {
+                  "type": "string",
+                  "default": "0x121A39A5154A5CD852C357D8267928e731F64658"
+                },
+                "toAddress": {
+                  "type": "string",
+                  "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
+                },
+                "amount": {
+                  "type": "integer",
+                  "default": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "examples": {
+              "application/json": {
+                "preimage": "fcfa6cd87ae9a65b3332487d225d603efc74b6b1af9d2f54e2d26cf4647ad4805eff86d7965f712ac966223180baab29b1cbfb6555de6e6dfe95683fe0a0",
+                "nullifierHash": "0x2736ba0d30b309c9d28ed48a605d3e34d2b695dbc9b6b5a88a05d79e8262ec2d"
+              }
+            }
+          },
+          "500": {
+            "description": "Error"
+          }
+        }
+      }
+    },
+    "/withdraw": {
+      "post": {
+        "tags": [
+          "Withdraw"
+        ],
+        "summary": "Withdraw a deposit",
+        "description": "Perform a withdrawal from an existing deposit",
+        "operationId": "",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Account address, deposit preimage and deposit nullifier hash",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "tokenAddress": {
+                  "type": "string",
+                  "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
+                },
+                "preimage": {
+                  "type": "string",
+                  "default": "fcfa6cd87ae9a65b3332487d225d603efc74b6b1af9d2f54e2d26cf4647ad4805eff86d7965f712ac966223180baab29b1cbfb6555de6e6dfe95683fe0a0"
+                },
+                "nullifierHash": {
+                  "type": "string",
+                  "default": "0x2736ba0d30b309c9d28ed48a605d3e34d2b695dbc9b6b5a88a05d79e8262ec2d"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "examples": {
+              "application/json": true
+            }
+          },
+          "500": {
+            "description": "Error"
+          }
+        }
+      }
+    }
+  }
+}
