@@ -21,7 +21,7 @@ if( !process.env.SSL ) {
 	const server = http.createServer( app );
 
 	server.listen( port, () => {
-		console.log( 'LACChain Tokenized Money Settlement API | v1.0 HTTP port', port );
+		console.log( 'LACChain Tokenized Money Settlement API | v1.1 HTTP port', port );
 	} );
 } else {
 	const privateKey = fs.readFileSync( process.env.CERT_KEY, 'utf8' );
@@ -30,6 +30,6 @@ if( !process.env.SSL ) {
 	const ssl = https.createServer( credentials, app );
 
 	ssl.listen( port, '0.0.0.0', () => {
-		console.log( 'LACChain Tokenized Money Settlement API | v1.0 HTTPS port', port );
+		console.log( 'LACChain Tokenized Money Settlement API | v1.1 HTTPS port', port );
 	} );
 }
