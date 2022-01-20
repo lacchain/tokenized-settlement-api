@@ -22,7 +22,7 @@ export default class APIRouter extends Router {
 		const operatorAddress = await operator.getAddress();
 
 		const redisClient = redis.createClient( {
-			host: 'redis',
+			host: 'redis-service',
 			port: 6379,
 			db: 1
 		} );
