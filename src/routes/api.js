@@ -80,6 +80,21 @@ export default class APIRouter extends Router {
 			return true;
 		} );
 
+		this.get( '/supply/:tokenAddress', async req => {
+			const { tokenAddress } = req.params;
+
+			const object = await redisClient.get( tokenAddress );
+			if( !object ) throw new Error( "Invalid token address" );
+
+			const institution = JSON.parse( object );
+			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
+
+			const totalSupply = await token.totalSupply();
+			return {
+				totalSupply: totalSupply.toString()
+			}
+		});
+
 		this.post( '/mint', async req => {
 			const { tokenAddress, amount } = req.body;
 
@@ -95,7 +110,7 @@ export default class APIRouter extends Router {
 
 			const totalSupply = await token.totalSupply();
 			return {
-				preimage: totalSupply.toString()
+				totalSupply: totalSupply.toString()
 			}
 		} );
 
@@ -140,7 +155,7 @@ export default class APIRouter extends Router {
 		} );
 
 		this.post( '/withdraw', async req => {
-			const { tokenAddress, preimage, nullifierHash } = req.body;
+			const { tokenAddress, preimage, nullifierHash, account } = req.body;
 
 			const object = await redisClient.get( tokenAddress );
 			if( !object ) throw new Error( "Invalid token address" );
@@ -149,24 +164,31 @@ export default class APIRouter extends Router {
 			const tornado = new ethers.Contract( institution.tornado, tornadoJSON.abi, operator );
 			//withdraw from institution tornado contract
 			const provingKey = ( await fs.readFileSync( path.resolve() + '/src/resources/external/withdraw_proving_key.bin' ) ).buffer;
-			const depositEvents = ( await tornado.queryFilter( 'Deposit', 35435620 ) ).map( depositArgs => ( {
+			const depositEvents = ( await tornado.queryFilter( 'Deposit', 37820396 ) ).map( depositArgs => ( {
 				leafIndex: depositArgs.args.leafIndex,
 				commitment: depositArgs.args.commitment,
 			} ) );
+
+			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
+			const role = await token.AUTHORISED_ROLE();
+			const hasRole = await token.hasRole( role, account );
+			if( !hasRole ) {
+				await token.addOrDeleteAuthorisedUser( account, true );
+			}
 
 			//sending the withdrawn tokens to institution2's contract address (as that already has the authorised role)
 			const {
 				root,
 				proof
-			} = await generateProof( Buffer.from( preimage, 'hex' ), institution.token, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
-			const rootHex = BNfrom( root ).toHexString();
+			} = await generateProof( Buffer.from( preimage, 'hex' ), account, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
+			const rootHex = BNfrom( root ).toHexString(); // direccion de cuenta particular
 
 			//checking the receiving address has 0 balance before the withdrawal
 			await tornado.withdraw(
 				proof,
 				rootHex,
 				nullifierHash,
-				institution.token,
+				account, // direccion de cuenta particular
 				ethers.constants.AddressZero,
 				0,
 				0

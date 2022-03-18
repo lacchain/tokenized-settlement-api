@@ -304,8 +304,8 @@
         "tags": [
           "Withdraw"
         ],
-        "summary": "Withdraw a deposit",
-        "description": "Perform a withdrawal from an existing deposit",
+        "summary": "Withdraw deposit",
+        "description": "Perform a withdrawal from an institution to an existing account. Grants the role to the account if not have yet",
         "operationId": "",
         "security": [
           {
@@ -321,7 +321,7 @@
         "parameters": [
           {
             "name": "body",
-            "description": "Account address, deposit preimage and deposit nullifier hash",
+            "description": "Institution token address, account address, deposit preimage and deposit nullifier hash",
             "in": "body",
             "required": true,
             "schema": {
@@ -330,6 +330,10 @@
                 "tokenAddress": {
                   "type": "string",
                   "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
+                },
+                "account": {
+                  "type": "string",
+                  "default": "0x90ff845f5db553415ce34dd6dd815692a29e6662"
                 },
                 "preimage": {
                   "type": "string",
