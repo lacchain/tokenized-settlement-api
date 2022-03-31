@@ -305,7 +305,7 @@
           "Withdraw"
         ],
         "summary": "Withdraw deposit",
-        "description": "Perform a withdrawal from an institution to an existing account. Grants the role to the account if not have yet",
+        "description": "Perform a withdrawal to an institution token address. Grants the role to the account if not have yet",
         "operationId": "",
         "security": [
           {
@@ -353,6 +353,113 @@
             "examples": {
               "application/json": true
             }
+          },
+          "500": {
+            "description": "Error"
+          }
+        }
+      }
+    },
+    "/addCustomer": {
+      "post": {
+        "tags": [
+          "Add Customer"
+        ],
+        "summary": "Add a customer to an institution",
+        "description": "Grants the AUTHORIZED ROLE to the account be able to receive transfers from the institution",
+        "operationId": "",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Institution token address, account address",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "tokenAddress": {
+                  "type": "string",
+                  "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
+                },
+                "account": {
+                  "type": "string",
+                  "default": "0x90ff845f5db553415ce34dd6dd815692a29e6662"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "examples": {
+              "application/json": true
+            }
+          },
+          "500": {
+            "description": "Error"
+          }
+        }
+      }
+    },
+    "/transferCustomer": {
+      "post": {
+        "tags": [
+          "Transfer Customer"
+        ],
+        "summary": "Transfer tokens from institution to a registered customer",
+        "description": "Generate a virtual deposit and perform a withdrawal to a specific registered customer account",
+        "operationId": "",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "description": "Institution token address, amount and customer account",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "tokenAddress": {
+                  "type": "string",
+                  "default": "0x121A39A5154A5CD852C357D8267928e731F64658"
+                },
+                "amount": {
+                  "type": "integer",
+                  "default": 1
+                },
+                "account": {
+                  "type": "string",
+                  "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           },
           "500": {
             "description": "Error"

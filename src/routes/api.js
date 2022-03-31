@@ -137,7 +137,7 @@ export default class APIRouter extends Router {
 				preimage: deposit.preimage.toString( 'hex' ),
 				nullifierHash: BNfrom( deposit.nullifierHash ).toHexString()
 			}
-		} )
+		} );
 
 		this.get( '/balance/:tokenAddress/:accountAddress', async req => {
 			const { tokenAddress, accountAddress } = req.params;
@@ -154,8 +154,26 @@ export default class APIRouter extends Router {
 			}
 		} );
 
+		this.post( '/addCustomer', async req => {
+			const { tokenAddress, account } = req.body;
+
+			const object = await redisClient.get( tokenAddress );
+			if( !object ) throw new Error( "Invalid token address" );
+
+			const institution = JSON.parse( object );
+			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
+
+			const role = await token.AUTHORISED_ROLE();
+			const hasRole = await token.hasRole( role, account );
+			if( !hasRole ) {
+				await token.addOrDeleteAuthorisedUser( account, true );
+			}
+
+			return true;
+		} );
+
 		this.post( '/withdraw', async req => {
-			const { tokenAddress, preimage, nullifierHash, account } = req.body;
+			const { tokenAddress, preimage, nullifierHash } = req.body;
 
 			const object = await redisClient.get( tokenAddress );
 			if( !object ) throw new Error( "Invalid token address" );
@@ -169,12 +187,52 @@ export default class APIRouter extends Router {
 				commitment: depositArgs.args.commitment,
 			} ) );
 
-			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
-			const role = await token.AUTHORISED_ROLE();
-			const hasRole = await token.hasRole( role, account );
-			if( !hasRole ) {
-				await token.addOrDeleteAuthorisedUser( account, true );
-			}
+			//sending the withdrawn tokens to institution2's contract address (as that already has the authorised role)
+			const {
+				root,
+				proof
+			} = await generateProof( Buffer.from( preimage, 'hex' ), tokenAddress, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
+			const rootHex = BNfrom( root ).toHexString(); // direccion de cuenta particular
+
+			//checking the receiving address has 0 balance before the withdrawal
+			await tornado.withdraw(
+				proof,
+				rootHex,
+				nullifierHash,
+				tokenAddress, // direccion de cuenta particular
+				ethers.constants.AddressZero,
+				0,
+				0
+			);
+
+			return true;
+		} );
+
+		this.post( '/transferCustomer', async req => {
+			const { tokenAddress, amount, account } = req.body;
+
+			if( isNaN( amount ) ) throw new Error( "amount is not a number" );
+
+			const object = await redisClient.get( tokenAddress );
+			if( !object ) throw new Error( "Invalid token address" );
+
+			const institution = JSON.parse( object );
+
+			const deposit = newDeposit();
+			let commitmentHex = BNfrom( deposit.commitment ).toHexString();
+			const tokenFrom = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
+			await tokenFrom.burnAndTransferToConnectedInstitution( amount, [amount], [commitmentHex], institution.name );
+
+			const preimage = deposit.preimage.toString( 'hex' );
+			const nullifierHash = BNfrom( deposit.nullifierHash ).toHexString();
+
+			const tornado = new ethers.Contract( institution.tornado, tornadoJSON.abi, operator );
+
+			const provingKey = ( await fs.readFileSync( path.resolve() + '/src/resources/external/withdraw_proving_key.bin' ) ).buffer;
+			const depositEvents = ( await tornado.queryFilter( 'Deposit', 37820396 ) ).map( depositArgs => ( {
+				leafIndex: depositArgs.args.leafIndex,
+				commitment: depositArgs.args.commitment,
+			} ) );
 
 			//sending the withdrawn tokens to institution2's contract address (as that already has the authorised role)
 			const {
@@ -195,7 +253,8 @@ export default class APIRouter extends Router {
 			);
 
 			return true;
-		} );
+
+		} )
 
 	}
 
