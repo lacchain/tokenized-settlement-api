@@ -114,6 +114,25 @@ export default class APIRouter extends Router {
 			}
 		} );
 
+		this.post( '/burn', async req => {
+			const { tokenAddress, amount } = req.body;
+
+			if( isNaN( amount ) ) throw new Error( "amount is not a number" );
+
+			const object = await redisClient.get( tokenAddress );
+			if( !object ) throw new Error( "Invalid token address" );
+
+			const institution = JSON.parse( object );
+			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
+
+			await token.burn( `0x${amount.toString( 16 )}` );
+
+			const totalSupply = await token.totalSupply();
+			return {
+				totalSupply: totalSupply.toString()
+			}
+		} );
+
 		this.post( '/transfer', async req => {
 			const { fromAddress, toAddress, amount } = req.body;
 

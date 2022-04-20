@@ -239,6 +239,61 @@
         }
       }
     },
+    "/burn": {
+      "post": {
+        "tags": [
+          "Burn"
+        ],
+        "summary": "Burn interoperable tokens",
+        "description": "Burn interoperable tokens of an institution",
+        "operationId": "",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "description": "institution token address and amount to burn",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "tokenAddress": {
+                  "type": "string",
+                  "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
+                },
+                "amount": {
+                  "type": "integer",
+                  "default": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "examples": {
+              "application/json": {
+                "totalSupply": "10"
+              }
+            }
+          },
+          "500": {
+            "description": "Error"
+          }
+        }
+      }
+    },
     "/transfer": {
       "post": {
         "tags": [
