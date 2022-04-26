@@ -239,65 +239,10 @@
         }
       }
     },
-    "/burn": {
+    "/transferInstitution1": {
       "post": {
         "tags": [
-          "Burn"
-        ],
-        "summary": "Burn interoperable tokens",
-        "description": "Burn interoperable tokens of an institution",
-        "operationId": "",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "body",
-            "description": "institution token address and amount to burn",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "tokenAddress": {
-                  "type": "string",
-                  "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
-                },
-                "amount": {
-                  "type": "integer",
-                  "default": 1
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "examples": {
-              "application/json": {
-                "totalSupply": "10"
-              }
-            }
-          },
-          "500": {
-            "description": "Error"
-          }
-        }
-      }
-    },
-    "/transfer": {
-      "post": {
-        "tags": [
-          "Transfer"
+          "Create the deposit"
         ],
         "summary": "Transfer tokens between institutions",
         "description": "Generate a ZKP transfer operation",
@@ -354,12 +299,12 @@
         }
       }
     },
-    "/withdraw": {
+    "/transferInstitution2": {
       "post": {
         "tags": [
-          "Withdraw"
+          "Transfer Institution"
         ],
-        "summary": "Withdraw deposit",
+        "summary": "Perform a withdrawal of deposit",
         "description": "Perform a withdrawal to an institution token address. Grants the role to the account if not have yet",
         "operationId": "",
         "security": [
@@ -376,7 +321,7 @@
         "parameters": [
           {
             "name": "body",
-            "description": "Institution token address, account address, deposit preimage and deposit nullifier hash",
+            "description": "Institution token address, deposit preimage and deposit nullifier hash",
             "in": "body",
             "required": true,
             "schema": {
@@ -385,10 +330,6 @@
                 "tokenAddress": {
                   "type": "string",
                   "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
-                },
-                "account": {
-                  "type": "string",
-                  "default": "0x90ff845f5db553415ce34dd6dd815692a29e6662"
                 },
                 "preimage": {
                   "type": "string",
