@@ -15,7 +15,8 @@ Content-Type: application/json
 {
 	"name": "Institution 2",
 	"symbol": "IN2",
-	"initialSupply": 5
+	"initialSupply
+    ": 5
 }
 
 ### Connect institution 1 to Institution 2
@@ -64,11 +65,49 @@ Content-Type: application/json
 }
 
 ### Withdraw from institution
-POST http://localhost:8080/withdraw
+POST http://localhost:8085/withdraw
 Content-Type: application/json
 
 {
 	"institutionIndex": 0,
 	"preimage": "53ef597dd4fbf748a130ed3df674055227e8771fac5e8a218b7a5ebdce74430bfbbb283a473f1db1d0002d753988ef5a15e59bdedd1d705e058e330913c8",
 	"nullifierHash": "0x2202a1850ff0b89026b77fe5ec8ec99f9451f9c9da6d6af9a34752230c1ea365"
+}
+
+###
+GET http://localhost:8085/supply/0x584313Eda93185b237EFadE00386599295A3112d
+
+###
+GET http://localhost:8085/balance/0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F/0x4222ec932c5a68b80e71f4ddebb069fa02518b8a
+
+###
+
+POST http://localhost:8085/connect
+Content-Type: application/json
+
+{
+	"fromAddress": "0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F",
+	"toAddress": "0x584313Eda93185b237EFadE00386599295A3112d"
+}
+
+###
+
+POST http://localhost:8085/connect
+Content-Type: application/json
+
+{
+	"fromAddress": "0x584313Eda93185b237EFadE00386599295A3112d",
+	"toAddress": "0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F"
+}
+
+
+###
+
+POST http://localhost:8085/transferInstitution1
+Content-Type: application/json
+
+{
+"fromAddress": "0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F",
+"toAddress": "0x584313Eda93185b237EFadE00386599295A3112d",
+"amount": 1
 }

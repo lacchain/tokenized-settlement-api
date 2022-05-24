@@ -12,6 +12,8 @@ import swaggerDocument from '../resources/swagger.json';
 const BNfrom = ethers.BigNumber.from;
 const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1", new ethers.providers.JsonRpcProvider( "https://writer.lacchain.net" ) );
 
+export const sleep = seconds => new Promise( resolve => setTimeout( resolve, seconds * 1e3 ) );
+
 export default class APIRouter extends Router {
 
 	constructor() {
@@ -182,7 +184,7 @@ export default class APIRouter extends Router {
 			const tornado = new ethers.Contract( institution.tornado, tornadoJSON.abi, operator );
 			//withdraw from institution tornado contract
 			const provingKey = ( await fs.readFileSync( path.resolve() + '/src/resources/external/withdraw_proving_key.bin' ) ).buffer;
-			const depositEvents = ( await tornado.queryFilter( 'Deposit', 37820396 ) ).map( depositArgs => ( {
+			const depositEvents = ( await tornado.queryFilter( 'Deposit', 40641403 ) ).map( depositArgs => ( {
 				leafIndex: depositArgs.args.leafIndex,
 				commitment: depositArgs.args.commitment,
 			} ) );
@@ -191,7 +193,7 @@ export default class APIRouter extends Router {
 			const {
 				root,
 				proof
-			} = await generateProof( Buffer.from( preimage, 'hex' ), tokenAddress, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
+			} = await generateProof( Buffer.from( preimage, 'hex' ), operatorAddress, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
 			const rootHex = BNfrom( root ).toHexString(); // direccion de cuenta particular
 
 			//checking the receiving address has 0 balance before the withdrawal
@@ -199,7 +201,7 @@ export default class APIRouter extends Router {
 				proof,
 				rootHex,
 				nullifierHash,
-				tokenAddress, // direccion de cuenta particular
+				operatorAddress, // direccion de cuenta particular
 				ethers.constants.AddressZero,
 				0,
 				0
@@ -228,8 +230,10 @@ export default class APIRouter extends Router {
 
 			const tornado = new ethers.Contract( institution.tornado, tornadoJSON.abi, operator );
 
+			await sleep(5);
+
 			const provingKey = ( await fs.readFileSync( path.resolve() + '/src/resources/external/withdraw_proving_key.bin' ) ).buffer;
-			const depositEvents = ( await tornado.queryFilter( 'Deposit', 37820396 ) ).map( depositArgs => ( {
+			const depositEvents = ( await tornado.queryFilter( 'Deposit', 40641403 ) ).map( depositArgs => ( {
 				leafIndex: depositArgs.args.leafIndex,
 				commitment: depositArgs.args.commitment,
 			} ) );

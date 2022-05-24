@@ -16,7 +16,7 @@ app.use( express.urlencoded( { extended: false } ) );
 app.use( '/', apiRouter.getRouter() );
 
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8085;
 if( !process.env.SSL ) {
 	const server = http.createServer( app );
 
