@@ -13,6 +13,25 @@ const BNfrom = ethers.BigNumber.from;
 const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1", new ethers.providers.JsonRpcProvider( "https://writer.lacchain.net" ) );
 
 export const sleep = seconds => new Promise( resolve => setTimeout( resolve, seconds * 1e3 ) );
+export const denominations = [1, 3, 5, 10];
+
+export const amountInDenominations = (amount, coins) => {
+	let amounts = [];
+	const res = {};
+
+	for (let i = 0; amount > 0 && i < coins.length; i++) {
+		const value = coins[i];
+
+		if (value <= amount) {
+			res[value] = Math.floor(amount / value);
+			amount -= value * res[value];
+			amounts = amounts.concat( Array(res[value]).fill(value) );
+		}
+	}
+
+	return amounts;
+}
+
 
 export default class APIRouter extends Router {
 
@@ -40,9 +59,13 @@ export default class APIRouter extends Router {
 			const token = await InteroperableToken.deploy( name, symbol, name, `0x${initialSupply.toString( 16 )}`, operatorAddress, operatorAddress, operatorAddress, operatorAddress, operatorAddress );
 			await token.deployed();
 
-			const tornado = await deployERC20Tornado( operator, 1, token.address )
-			await tornado.deployed();
-			await token.addTornadoContract( tornado.address );
+			const tornados = {};
+			for( const denomination of denominations ){
+				const tornado = await deployERC20Tornado( operator, denomination, token.address )
+				await tornado.deployed();
+				await token.addTornadoContract( tornado.address );
+				tornados[`d_${denomination}`] = tornado.address;
+			}
 
 			const totalSupply = await token.totalSupply();
 
@@ -51,14 +74,14 @@ export default class APIRouter extends Router {
 				symbol,
 				initialSupply,
 				token: token.address,
-				tornado: tornado.address
+				tornados
 			} ) );
 
 			return {
 				name,
 				symbol,
 				tokenAddress: token.address,
-				tornadoAddress: tornado.address,
+				tornados,
 				totalSupply: totalSupply.toString()
 			};
 		} );
@@ -110,34 +133,11 @@ export default class APIRouter extends Router {
 
 			await token.mint( operatorAddress, `0x${amount.toString( 16 )}` );
 
+			await sleep(3);
+
 			const totalSupply = await token.totalSupply();
 			return {
 				totalSupply: totalSupply.toString()
-			}
-		} );
-
-		this.post( '/transferInstitution1', async req => {
-			const { fromAddress, toAddress, amount } = req.body;
-
-			if( isNaN( amount ) ) throw new Error( "amount is not a number" );
-
-			const from = await redisClient.get( fromAddress );
-			const to = await redisClient.get( toAddress );
-
-			if( !from ) throw new Error( "Invalid (from) institution" );
-			if( !to ) throw new Error( "Invalid (to) institution" );
-
-			const institutionFrom = JSON.parse( from );
-			const institutionTo = JSON.parse( to );
-
-			const deposit = newDeposit();
-			let commitmentHex = BNfrom( deposit.commitment ).toHexString();
-			const tokenFrom = new ethers.Contract( institutionFrom.token, InteroperableTokenJSON.abi, operator );
-			await tokenFrom.burnAndTransferToConnectedInstitution( amount, [amount], [commitmentHex], institutionTo.name );
-
-			return {
-				preimage: deposit.preimage.toString( 'hex' ),
-				nullifierHash: BNfrom( deposit.nullifierHash ).toHexString()
 			}
 		} );
 
@@ -150,7 +150,7 @@ export default class APIRouter extends Router {
 			const institution = JSON.parse( object );
 
 			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
-			const balance = await token.balanceOf( accountAddress ); // 0x4222ec932c5a68b80e71f4ddebb069fa02518b8a
+			const balance = await token.balanceOf( accountAddress ); // operator = 0x4222ec932c5a68b80e71f4ddebb069fa02518b8a
 			return {
 				balance: balance.toString()
 			}
@@ -174,39 +174,51 @@ export default class APIRouter extends Router {
 			return true;
 		} );
 
+		this.post( '/transferInstitution1', async req => {
+			const { fromAddress, toAddress, amount } = req.body;
+
+			if( isNaN( amount ) ) throw new Error( "amount is not a number" );
+
+			const from = await redisClient.get( fromAddress );
+			const to = await redisClient.get( toAddress );
+
+			if( !from ) throw new Error( "Invalid (from) institution" );
+			if( !to ) throw new Error( "Invalid (to) institution" );
+
+			const institutionFrom = JSON.parse( from );
+			const institutionTo = JSON.parse( to );
+
+			const amounts = amountInDenominations( amount, denominations.reverse());
+			const deposits = amounts.map( value => ({ denomination: value, ...newDeposit() }) );
+			const tokenFrom = new ethers.Contract( institutionFrom.token, InteroperableTokenJSON.abi, operator );
+			await tokenFrom.burnAndTransferToConnectedInstitution( amount, amounts, deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() ), institutionTo.name );
+			return deposits.map( ({ denomination, preimage, nullifierHash,  }) => ({
+				denomination,
+				preimage: preimage.toString( 'hex' ),
+				nullifierHash: BNfrom( nullifierHash ).toHexString()
+			}) )
+		} );
+
 		this.post( '/transferInstitution2', async req => {
-			const { tokenAddress, preimage, nullifierHash } = req.body;
+			const { tokenAddress, deposits } = req.body;
 
 			const object = await redisClient.get( tokenAddress );
 			if( !object ) throw new Error( "Invalid token address" );
 
 			const institution = JSON.parse( object );
-			const tornado = new ethers.Contract( institution.tornado, tornadoJSON.abi, operator );
-			//withdraw from institution tornado contract
+
 			const provingKey = ( await fs.readFileSync( path.resolve() + '/src/resources/external/withdraw_proving_key.bin' ) ).buffer;
-			const depositEvents = ( await tornado.queryFilter( 'Deposit', 40641403 ) ).map( depositArgs => ( {
-				leafIndex: depositArgs.args.leafIndex,
-				commitment: depositArgs.args.commitment,
-			} ) );
 
-			//sending the withdrawn tokens to institution2's contract address (as that already has the authorised role)
-			const {
-				root,
-				proof
-			} = await generateProof( Buffer.from( preimage, 'hex' ), operatorAddress, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
-			const rootHex = BNfrom( root ).toHexString(); // direccion de cuenta particular
-
-			//checking the receiving address has 0 balance before the withdrawal
-			await tornado.withdraw(
-				proof,
-				rootHex,
-				nullifierHash,
-				operatorAddress, // direccion de cuenta particular
-				ethers.constants.AddressZero,
-				0,
-				0
-			);
-
+			for( const deposit of deposits ) {
+				const tornado = new ethers.Contract( institution.tornados[`d_${deposit.denomination}`], tornadoJSON.abi, operator );
+				const depositEvents = ( await tornado.queryFilter( 'Deposit', 40641403 ) ).map( depositArgs => ( {
+					leafIndex: depositArgs.args.leafIndex,
+					commitment: depositArgs.args.commitment,
+				} ) );
+				const { root, proof } = await generateProof( Buffer.from( deposit.preimage, 'hex' ), operatorAddress, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
+				const rootHex = BNfrom( root ).toHexString();
+				await tornado.withdraw( proof, rootHex, deposit.nullifierHash, operatorAddress, ethers.constants.AddressZero, 0, 0 );
+			}
 			return true;
 		} );
 
@@ -220,44 +232,33 @@ export default class APIRouter extends Router {
 
 			const institution = JSON.parse( object );
 
-			const deposit = newDeposit();
-			let commitmentHex = BNfrom( deposit.commitment ).toHexString();
-			const tokenFrom = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
-			await tokenFrom.burnAndTransferToConnectedInstitution( amount, [amount], [commitmentHex], institution.name );
+			const amounts = amountInDenominations( amount, denominations.reverse());
+			const deposits = amounts.map( value => ({ denomination: value, ...newDeposit() }) );
+			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
+			await token.burnAndTransferToConnectedInstitution( amount, amounts, deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() ), institution.name );
+			const proofs = deposits.map( ({ denomination, preimage, nullifierHash,  }) => ({
+				denomination,
+				preimage: preimage.toString( 'hex' ),
+				nullifierHash: BNfrom( nullifierHash ).toHexString()
+			}) )
 
-			const preimage = deposit.preimage.toString( 'hex' );
-			const nullifierHash = BNfrom( deposit.nullifierHash ).toHexString();
-
-			const tornado = new ethers.Contract( institution.tornado, tornadoJSON.abi, operator );
-
-			await sleep(5);
+			// Wait after burnAndTransferToConnectedInstitution tx
+			await sleep(3);
 
 			const provingKey = ( await fs.readFileSync( path.resolve() + '/src/resources/external/withdraw_proving_key.bin' ) ).buffer;
-			const depositEvents = ( await tornado.queryFilter( 'Deposit', 40641403 ) ).map( depositArgs => ( {
-				leafIndex: depositArgs.args.leafIndex,
-				commitment: depositArgs.args.commitment,
-			} ) );
 
-			//sending the withdrawn tokens to institution2's contract address (as that already has the authorised role)
-			const {
-				root,
-				proof
-			} = await generateProof( Buffer.from( preimage, 'hex' ), account, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
-			const rootHex = BNfrom( root ).toHexString(); // direccion de cuenta particular
-
-			//checking the receiving address has 0 balance before the withdrawal
-			await tornado.withdraw(
-				proof,
-				rootHex,
-				nullifierHash,
-				account, // direccion de cuenta particular
-				ethers.constants.AddressZero,
-				0,
-				0
-			);
+			for( const deposit of proofs ) {
+				const tornado = new ethers.Contract( institution.tornados[`d_${deposit.denomination}`], tornadoJSON.abi, operator );
+				const depositEvents = ( await tornado.queryFilter( 'Deposit', 40641403 ) ).map( depositArgs => ( {
+					leafIndex: depositArgs.args.leafIndex,
+					commitment: depositArgs.args.commitment,
+				} ) );
+				const { root, proof } = await generateProof( Buffer.from( deposit.preimage, 'hex' ), account, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
+				const rootHex = BNfrom( root ).toHexString();
+				await tornado.withdraw( proof, rootHex, deposit.nullifierHash, account, ethers.constants.AddressZero, 0, 0 );
+			}
 
 			return true;
-
 		} )
 
 	}
