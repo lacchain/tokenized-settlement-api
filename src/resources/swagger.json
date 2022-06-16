@@ -287,10 +287,28 @@
           "200": {
             "description": "Success",
             "examples": {
-              "application/json": {
-                "preimage": "fcfa6cd87ae9a65b3332487d225d603efc74b6b1af9d2f54e2d26cf4647ad4805eff86d7965f712ac966223180baab29b1cbfb6555de6e6dfe95683fe0a0",
-                "nullifierHash": "0x2736ba0d30b309c9d28ed48a605d3e34d2b695dbc9b6b5a88a05d79e8262ec2d"
-              }
+              "application/json": [
+                {
+                  "denomination": 10,
+                  "preimage": "a5982ad013bae54e94cf915ddb6bdd119042b28d56368fbbfdd59e100f98695d07810b147237d45caf5aafbf5e2f3db4e15a8b8206fabd999d6ec7a83ca5",
+                  "nullifierHash": "0x1e0797ddbcb0c3d2735ffd8f66185a24b2c12ab24fe049566d88210d66e63a16"
+                },
+                {
+                  "denomination": 5,
+                  "preimage": "15e0578b8a6885b73b542e131f069e11b48b76940c331993798ad2f492cf098e7cf46f188132aa88dcf3bac60063c244077ca2ece2f3cca94e48e23bdc30",
+                  "nullifierHash": "0x29060a4e67938d81f61d0f024b0bc7f626fd1f7c1eaf56b5607524e863a23033"
+                },
+                {
+                  "denomination": 1,
+                  "preimage": "392fde5e6da096a958062b81566e8a831c599009ecc18cb9d52d2e5726c8439d70b89940622dfac429f7c1bb37ec237a94fdffff861770493a1d061e22e9",
+                  "nullifierHash": "0x18ec0532fb379f5fd555068602cfcc806a79cb3743186a38dbc987430aea1d6d"
+                },
+                {
+                  "denomination": 1,
+                  "preimage": "e45b931ffac2deaa6753546510cb501c8797b6bbbad200e4258fe28adf6370a2ad673f0c0f23a6a73d55b42b8db1e35821c00242e1eb120f1238576c0f0e",
+                  "nullifierHash": "0x1574388e66f99805b0adcb7aa13b7245e800615b4e1672a5db6ba72363183035"
+                }
+              ]
             }
           },
           "500": {
@@ -331,14 +349,28 @@
                   "type": "string",
                   "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
                 },
-                "preimage": {
-                  "type": "string",
-                  "default": "fcfa6cd87ae9a65b3332487d225d603efc74b6b1af9d2f54e2d26cf4647ad4805eff86d7965f712ac966223180baab29b1cbfb6555de6e6dfe95683fe0a0"
-                },
-                "nullifierHash": {
-                  "type": "string",
-                  "default": "0x2736ba0d30b309c9d28ed48a605d3e34d2b695dbc9b6b5a88a05d79e8262ec2d"
-                }
+                "deposits": [
+                  {
+                    "denomination": 10,
+                    "preimage": "a5982ad013bae54e94cf915ddb6bdd119042b28d56368fbbfdd59e100f98695d07810b147237d45caf5aafbf5e2f3db4e15a8b8206fabd999d6ec7a83ca5",
+                    "nullifierHash": "0x1e0797ddbcb0c3d2735ffd8f66185a24b2c12ab24fe049566d88210d66e63a16"
+                  },
+                  {
+                    "denomination": 5,
+                    "preimage": "15e0578b8a6885b73b542e131f069e11b48b76940c331993798ad2f492cf098e7cf46f188132aa88dcf3bac60063c244077ca2ece2f3cca94e48e23bdc30",
+                    "nullifierHash": "0x29060a4e67938d81f61d0f024b0bc7f626fd1f7c1eaf56b5607524e863a23033"
+                  },
+                  {
+                    "denomination": 1,
+                    "preimage": "392fde5e6da096a958062b81566e8a831c599009ecc18cb9d52d2e5726c8439d70b89940622dfac429f7c1bb37ec237a94fdffff861770493a1d061e22e9",
+                    "nullifierHash": "0x18ec0532fb379f5fd555068602cfcc806a79cb3743186a38dbc987430aea1d6d"
+                  },
+                  {
+                    "denomination": 1,
+                    "preimage": "e45b931ffac2deaa6753546510cb501c8797b6bbbad200e4258fe28adf6370a2ad673f0c0f23a6a73d55b42b8db1e35821c00242e1eb120f1238576c0f0e",
+                    "nullifierHash": "0x1574388e66f99805b0adcb7aa13b7245e800615b4e1672a5db6ba72363183035"
+                  }
+                ]
               }
             }
           }
