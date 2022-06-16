@@ -242,7 +242,7 @@
     "/transferInstitution1": {
       "post": {
         "tags": [
-          "Create the deposit"
+          "Create the deposits"
         ],
         "summary": "Transfer tokens between institutions",
         "description": "Generate a ZKP transfer operation",
@@ -304,7 +304,7 @@
         "tags": [
           "Transfer Institution"
         ],
-        "summary": "Perform a withdrawal of deposit",
+        "summary": "Perform a withdrawal of deposits",
         "description": "Perform a withdrawal to an institution token address. Grants the role to the account if not have yet",
         "operationId": "",
         "security": [
