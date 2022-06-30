@@ -13,7 +13,7 @@ const BNfrom = ethers.BigNumber.from;
 const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1", new ethers.providers.JsonRpcProvider( "https://writer.lacchain.net" ) );
 
 export const sleep = seconds => new Promise( resolve => setTimeout( resolve, seconds * 1e3 ) );
-export const denominations = [1, 3, 5, 10];
+export const denominations = [1, 3, 5, 10, 50, 100];
 
 export const amountInDenominations = (amount, coins) => {
 	let amounts = [];
