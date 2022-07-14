@@ -13,7 +13,7 @@ const BNfrom = ethers.BigNumber.from;
 const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1", new ethers.providers.JsonRpcProvider( "https://writer.lacchain.net" ) );
 
 export const sleep = seconds => new Promise( resolve => setTimeout( resolve, seconds * 1e3 ) );
-export const denominations = [1, 3, 5, 10, 50, 100];
+export const denominations = [1, 3, 5, 10, 50, 100, 300, 500, 1000, 5000, 10000, 20000, 40000];
 
 export const amountInDenominations = (amount, coins) => {
 	let amounts = [];
@@ -211,7 +211,7 @@ export default class APIRouter extends Router {
 
 			for( const deposit of deposits ) {
 				const tornado = new ethers.Contract( institution.tornados[`d_${deposit.denomination}`], tornadoJSON.abi, operator );
-				const depositEvents = ( await tornado.queryFilter( 'Deposit', 41633120 ) ).map( depositArgs => ( {
+				const depositEvents = ( await tornado.queryFilter( 'Deposit', 42742914 ) ).map( depositArgs => ( {
 					leafIndex: depositArgs.args.leafIndex,
 					commitment: depositArgs.args.commitment,
 				} ) );
@@ -249,7 +249,7 @@ export default class APIRouter extends Router {
 
 			for( const deposit of proofs ) {
 				const tornado = new ethers.Contract( institution.tornados[`d_${deposit.denomination}`], tornadoJSON.abi, operator );
-				const depositEvents = ( await tornado.queryFilter( 'Deposit', 41633120 ) ).map( depositArgs => ( {
+				const depositEvents = ( await tornado.queryFilter( 'Deposit', 42742914 ) ).map( depositArgs => ( {
 					leafIndex: depositArgs.args.leafIndex,
 					commitment: depositArgs.args.commitment,
 				} ) );
