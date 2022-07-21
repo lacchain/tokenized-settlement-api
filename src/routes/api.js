@@ -15,12 +15,12 @@ const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7
 export const sleep = seconds => new Promise( resolve => setTimeout( resolve, seconds * 1e3 ) );
 export const denominations = [1, 3, 5, 10, 50, 100, 300, 500, 1000, 5000, 10000, 20000, 40000];
 
-export const amountInDenominations = (amount, coins) => {
+export const amountInDenominations = amount => {
 	let amounts = [];
 	const res = {};
 
-	for (let i = 0; amount > 0 && i < coins.length; i++) {
-		const value = coins[i];
+	for (let i = 0; amount > 0 && i < denominations.length; i++) {
+		const value = denominations[denominations.length - i - 1];
 
 		if (value <= amount) {
 			res[value] = Math.floor(amount / value);
@@ -188,10 +188,10 @@ export default class APIRouter extends Router {
 			const institutionFrom = JSON.parse( from );
 			const institutionTo = JSON.parse( to );
 
-			const amounts = amountInDenominations( amount, denominations.reverse());
+			const amounts = amountInDenominations( amount + 0 );
 			const deposits = amounts.map( value => ({ denomination: value, ...newDeposit() }) );
 			const tokenFrom = new ethers.Contract( institutionFrom.token, InteroperableTokenJSON.abi, operator );
-			console.log( amount, amounts, deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() ), institutionTo.name );
+			console.log( amount, amounts );
 			await tokenFrom.burnAndTransferToConnectedInstitution( amount, amounts, deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() ), institutionTo.name );
 			return deposits.map( ({ denomination, preimage, nullifierHash,  }) => ({
 				denomination,
@@ -233,7 +233,7 @@ export default class APIRouter extends Router {
 
 			const institution = JSON.parse( object );
 
-			const amounts = amountInDenominations( amount, denominations.reverse());
+			const amounts = amountInDenominations( amount + 0);
 			const deposits = amounts.map( value => ({ denomination: value, ...newDeposit() }) );
 			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
 			await token.burnAndTransferToConnectedInstitution( amount, amounts, deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() ), institution.name );
