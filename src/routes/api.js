@@ -235,6 +235,7 @@ export default class APIRouter extends Router {
 
 			const amounts = amountInDenominations( amount + 0);
 			const deposits = amounts.map( value => ({ denomination: value, ...newDeposit() }) );
+			console.log( 'transferCustomer', amount, amounts );
 			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
 			await token.burnAndTransferToConnectedInstitution( amount, amounts, deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() ), institution.name );
 			const proofs = deposits.map( ({ denomination, preimage, nullifierHash,  }) => ({

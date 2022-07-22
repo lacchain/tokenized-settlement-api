@@ -6,5 +6,5 @@ export default {
 	ELASTIC_APP_KEY: process.env.ELASTIC_APP_KEY || "J5uroNDJV88RdtKDQE6sQL8z",
 	ELASTIC_APP_INDEX: process.env.ELASTIC_APP_INDEX || "tokenized-money-api",
 	ELASTIC_LOGGER_LEVEL: process.env.ELASTIC_LOGGER_LEVEL || "debug",
-	CONSOLE_LOGGER_LEVEL: process.env.CONSOLE_LOGGER_LEVEL || "info"
+	CONSOLE_LOGGER_LEVEL: process.env.CONSOLE_LOGGER_LEVEL || "debug"
 }
