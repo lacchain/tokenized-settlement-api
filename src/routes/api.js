@@ -213,7 +213,7 @@ export default class APIRouter extends Router {
 
 			for( const deposit of deposits ) {
 				const tornado = new ethers.Contract( institution.tornados[`d_${deposit.denomination}`], tornadoJSON.abi, operator );
-				const depositEvents = ( await tornado.queryFilter( 'Deposit', 42742914 ) ).map( depositArgs => ( {
+				const depositEvents = ( await tornado.queryFilter( 'Deposit', 43231759 ) ).map( depositArgs => ( {
 					leafIndex: depositArgs.args.leafIndex,
 					commitment: depositArgs.args.commitment,
 				} ) );
@@ -247,13 +247,13 @@ export default class APIRouter extends Router {
 			}) )
 
 			// Wait after burnAndTransferToConnectedInstitution tx
-			await sleep(5);
+			await sleep(10);
 
 			const provingKey = ( await fs.readFileSync( path.resolve() + '/src/resources/external/withdraw_proving_key.bin' ) ).buffer;
 
 			for( const deposit of proofs ) {
 				const tornado = new ethers.Contract( institution.tornados[`d_${deposit.denomination}`], tornadoJSON.abi, operator );
-				const depositEvents = ( await tornado.queryFilter( 'Deposit', 42742914 ) ).map( depositArgs => ( {
+				const depositEvents = ( await tornado.queryFilter( 'Deposit', 43231759 ) ).map( depositArgs => ( {
 					leafIndex: depositArgs.args.leafIndex,
 					commitment: depositArgs.args.commitment,
 				} ) );
