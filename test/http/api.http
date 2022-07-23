@@ -111,6 +111,16 @@ Content-Type: application/json
 	"amount": 1750
 }
 
+### Add customer 1
+POST http://104.154.147.42:8080/addCustomer
+Content-Type: application/json
+
+{
+	"tokenAddress": "0x9c872367e6d3Cbab7882e6CF71e9385aC045feb7",
+	"account": "0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F"
+}
+
+
 ### Transfer to customer 1
 POST http://104.154.147.42:8080/transferCustomer
 Content-Type: application/json

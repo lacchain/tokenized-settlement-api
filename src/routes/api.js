@@ -247,7 +247,7 @@ export default class APIRouter extends Router {
 			}) )
 
 			// Wait after burnAndTransferToConnectedInstitution tx
-			await sleep(10);
+			await sleep(5);
 
 			const provingKey = ( await fs.readFileSync( path.resolve() + '/src/resources/external/withdraw_proving_key.bin' ) ).buffer;
 
