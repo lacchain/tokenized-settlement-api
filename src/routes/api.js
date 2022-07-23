@@ -191,8 +191,9 @@ export default class APIRouter extends Router {
 			const amounts = amountInDenominations( amount + 0 );
 			const deposits = amounts.map( value => ({ denomination: value, ...newDeposit() }) );
 			const tokenFrom = new ethers.Contract( institutionFrom.token, InteroperableTokenJSON.abi, operator );
-			console.log( amount, amounts );
-			await tokenFrom.burnAndTransferToConnectedInstitution( amount, amounts, deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() ), institutionTo.name );
+			const commitments = deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() );
+			this.logger.silly( `transferInstitution1`, { amount, amounts, commitments, institution: institutionTo.name } );
+			await tokenFrom.burnAndTransferToConnectedInstitution( amount, amounts, commitments, institutionTo.name );
 			return deposits.map( ({ denomination, preimage, nullifierHash,  }) => ({
 				denomination,
 				preimage: preimage.toString( 'hex' ),
@@ -235,9 +236,10 @@ export default class APIRouter extends Router {
 
 			const amounts = amountInDenominations( amount + 0);
 			const deposits = amounts.map( value => ({ denomination: value, ...newDeposit() }) );
-			console.log( 'transferCustomer', amount, amounts );
 			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
-			await token.burnAndTransferToConnectedInstitution( amount, amounts, deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() ), institution.name );
+			const commitments = deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() );
+			this.logger.silly( `transferCustomer`, { amount, amounts, commitments, institution: institution.name } );
+			await token.burnAndTransferToConnectedInstitution( amount, amounts, commitments, institution.name );
 			const proofs = deposits.map( ({ denomination, preimage, nullifierHash,  }) => ({
 				denomination,
 				preimage: preimage.toString( 'hex' ),
