@@ -23,8 +23,8 @@ POST http://104.154.147.42:8080/connect
 Content-Type: application/json
 
 {
-	"indexFrom": 0,
-	"indexTo": 1
+	"fromAddress": "0x9c872367e6d3Cbab7882e6CF71e9385aC045feb7",
+	"toAddress": "0x1c0687d7A9e00a2F2ab5782546ab7D909bE45254"
 }
 
 ### Connect institution 2 to Institution 1
@@ -32,17 +32,17 @@ POST http://104.154.147.42:8080/connect
 Content-Type: application/json
 
 {
-	"indexFrom": 1,
-	"indexTo": 0
+	"fromAddress": "0x1c0687d7A9e00a2F2ab5782546ab7D909bE45254",
+	"toAddress": "0x9c872367e6d3Cbab7882e6CF71e9385aC045feb7"
 }
 
 ### Mint to a institution
-POST http://localhost:8080/mint
+POST http://104.154.147.42:8080/mint
 Content-Type: application/json
 
 {
-	"institutionIndex": 0,
-	"amount": 2
+	"tokenAddress": "0x9c872367e6d3Cbab7882e6CF71e9385aC045feb7",
+	"amount": 25000
 }
 
 ### Deposit indexFrom to indexTo institution
@@ -102,11 +102,21 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:8085/transferInstitution1
+POST http://104.154.147.42:8080/transferInstitution1
 Content-Type: application/json
 
 {
-"fromAddress": "0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F",
-"toAddress": "0x584313Eda93185b237EFadE00386599295A3112d",
-"amount": 1
+	"fromAddress": "0x9c872367e6d3Cbab7882e6CF71e9385aC045feb7",
+	"toAddress": "0x1c0687d7A9e00a2F2ab5782546ab7D909bE45254",
+	"amount": 1750
+}
+
+### Transfer to customer 1
+POST http://104.154.147.42:8080/transferCustomer
+Content-Type: application/json
+
+{
+	"tokenAddress": "0x9c872367e6d3Cbab7882e6CF71e9385aC045feb7",
+	"account": "0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F",
+	"amount": 1750
 }

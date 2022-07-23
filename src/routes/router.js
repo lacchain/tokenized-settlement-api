@@ -8,7 +8,7 @@ export default class Router {
 
 	constructor() {
 		this.router = express.Router();
-		this.logger = ( new Logger() ).instance( `${config.ELASTIC_APP_INDEX}-api` );
+		this.logger = ( new Logger() ).instance( config.ELASTIC_APP_INDEX );
 		this.init();
 	}
 
@@ -56,12 +56,12 @@ export default class Router {
 			} catch( error ) {
 				this.logger.error( `${params[0].method} ${params[0].originalUrl}`, {
 					response: {
-						status: 500,
-						error: error + ''
+						code: error.code || -1,
+						message: error.message
 					},
 					request: JSON.stringify( params[0].body, null, 2 )
 				} );
-				params[1].sendError( error + '' );
+				params[1].sendError( { code: error.code || -1, message: error.message } );
 			}
 		} );
 	}

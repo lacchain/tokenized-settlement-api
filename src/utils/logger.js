@@ -28,7 +28,7 @@ export default class Logger {
 				new winston.transports.Console( {
 					level: config.CONSOLE_LOGGER_LEVEL,
 					handleExceptions: true,
-					format: winston.format.cli(),
+					json: true,
 					colorize: true
 				} )
 			],
