@@ -21,6 +21,7 @@ export default class Logger {
 			transports: [
 				...( config.ELASTIC_LOGGER_LEVEL !== 'none' ? [new WinstonElastic.ElasticsearchTransport( {
 					level: config.ELASTIC_LOGGER_LEVEL,
+					dataStream: true,
 					index,
 					client: this.client
 				} )] : [] ),

@@ -15,8 +15,7 @@ Content-Type: application/json
 {
 	"name": "Institution 2",
 	"symbol": "IN2",
-	"initialSupply
-    ": 5
+	"initialSupply": 10
 }
 
 ### Connect institution 1 to Institution 2
