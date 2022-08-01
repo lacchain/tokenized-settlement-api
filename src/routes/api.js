@@ -234,35 +234,8 @@ export default class APIRouter extends Router {
 
 			const institution = JSON.parse( object );
 
-			const amounts = amountInDenominations( amount + 0);
-			const deposits = amounts.map( value => ({ denomination: value, ...newDeposit() }) );
 			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
-			const commitments = deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() );
-			this.logger.silly( `transferCustomer`, { amount, amounts, commitments, institution: institution.name } );
-			await token.burnAndTransferToConnectedInstitution( amount, amounts, commitments, institution.name );
-			const proofs = deposits.map( ({ denomination, preimage, nullifierHash,  }) => ({
-				denomination,
-				preimage: preimage.toString( 'hex' ),
-				nullifierHash: BNfrom( nullifierHash ).toHexString()
-			}) )
-
-			// Wait after burnAndTransferToConnectedInstitution tx
-			await sleep(10);
-
-			const provingKey = ( await fs.readFileSync( path.resolve() + '/src/resources/external/withdraw_proving_key.bin' ) ).buffer;
-
-			for( const deposit of proofs ) {
-				const tornado = new ethers.Contract( institution.tornados[`d_${deposit.denomination}`], tornadoJSON.abi, operator );
-				const depositEvents = ( await tornado.queryFilter( 'Deposit', 43231759 ) ).map( depositArgs => ( {
-					leafIndex: depositArgs.args.leafIndex,
-					commitment: depositArgs.args.commitment,
-				} ) );
-				const { root, proof } = await generateProof( Buffer.from( deposit.preimage, 'hex' ), account, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
-				const rootHex = BNfrom( root ).toHexString();
-				await tornado.withdraw( proof, rootHex, deposit.nullifierHash, account, ethers.constants.AddressZero, 0, 0 );
-			}
-
-			return true;
+			return await token.transfer( account, amount );
 		} )
 
 	}
