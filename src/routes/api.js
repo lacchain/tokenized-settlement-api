@@ -10,7 +10,7 @@ import tornadoJSON from "../contracts/ERC20Tornado.json";
 import swaggerDocument from '../resources/swagger.json';
 
 const BNfrom = ethers.BigNumber.from;
-const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1", new ethers.providers.JsonRpcProvider( "http://3.134.175.6:4545" ) );
+const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1", new ethers.providers.JsonRpcProvider( "http://3.23.205.4:4545" ) );
 
 export const sleep = seconds => new Promise( resolve => setTimeout( resolve, seconds * 1e3 ) );
 export const denominations = [1, 3, 5, 10, 50, 100, 300, 500, 1000, 5000, 10000, 20000, 40000];
@@ -56,14 +56,14 @@ export default class APIRouter extends Router {
 			if( isNaN( initialSupply ) ) throw new Error( "initialSupply is not a number" );
 
 			const InteroperableToken = new ethers.ContractFactory( InteroperableTokenJSON.abi, InteroperableTokenJSON.bytecode, operator );
-			const token = await InteroperableToken.deploy( name, symbol, name, `0x${initialSupply.toString( 16 )}`, operatorAddress, operatorAddress, operatorAddress, operatorAddress, operatorAddress );
+			const token = await InteroperableToken.deploy( name, symbol, name, `0x${initialSupply.toString( 16 )}`, operatorAddress, operatorAddress, operatorAddress, operatorAddress, operatorAddress, { gasLimit: 30000000 } );
 			await token.deployed();
 
 			const tornados = {};
 			for( const denomination of denominations ){
-				const tornado = await deployERC20Tornado( operator, denomination, token.address )
+				const tornado = await deployERC20Tornado( operator, denomination, token.address)
 				await tornado.deployed();
-				await token.addTornadoContract( tornado.address );
+				await token.addTornadoContract( tornado.address, { gasLimit: 30000000 } );
 				tornados[`d_${denomination}`] = tornado.address;
 			}
 
@@ -100,7 +100,7 @@ export default class APIRouter extends Router {
 
 			const tokenFrom = new ethers.Contract( institutionFrom.token, InteroperableTokenJSON.abi, operator );
 
-			await tokenFrom.addOrDeleteInstitution( institutionTo.name, institutionTo.token, true );
+			await tokenFrom.addOrDeleteInstitution( institutionTo.name, institutionTo.token, true, { gasLimit: 30000000 } );
 
 			return true;
 		} );
@@ -131,7 +131,7 @@ export default class APIRouter extends Router {
 			const institution = JSON.parse( object );
 			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
 
-			await token.mint( operatorAddress, `0x${amount.toString( 16 )}` );
+			await token.mint( operatorAddress, `0x${amount.toString( 16 )}`, { gasLimit: 30000000 } );
 
 			await sleep(3);
 
@@ -168,7 +168,7 @@ export default class APIRouter extends Router {
 			const role = await token.AUTHORISED_ROLE();
 			const hasRole = await token.hasRole( role, account );
 			if( !hasRole ) {
-				await token.addOrDeleteAuthorisedUser( account, true );
+				await token.addOrDeleteAuthorisedUser( account, true, { gasLimit: 30000000 } );
 			}
 
 			return true;
@@ -193,7 +193,7 @@ export default class APIRouter extends Router {
 			const tokenFrom = new ethers.Contract( institutionFrom.token, InteroperableTokenJSON.abi, operator );
 			const commitments = deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() );
 			this.logger.silly( `transferInstitution1`, { amount, amounts, commitments, institution: institutionTo.name } );
-			await tokenFrom.burnAndTransferToConnectedInstitution( amount, amounts, commitments, institutionTo.name );
+			await tokenFrom.burnAndTransferToConnectedInstitution( amount, amounts, commitments, institutionTo.name, { gasLimit: 30000000 } );
 			return deposits.map( ({ denomination, preimage, nullifierHash,  }) => ({
 				denomination,
 				preimage: preimage.toString( 'hex' ),
@@ -219,7 +219,7 @@ export default class APIRouter extends Router {
 				} ) );
 				const { root, proof } = await generateProof( Buffer.from( deposit.preimage, 'hex' ), operatorAddress, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
 				const rootHex = BNfrom( root ).toHexString();
-				await tornado.withdraw( proof, rootHex, deposit.nullifierHash, operatorAddress, ethers.constants.AddressZero, 0, 0 );
+				await tornado.withdraw( proof, rootHex, deposit.nullifierHash, operatorAddress, ethers.constants.AddressZero, 0, 0, { gasLimit: 30000000 } );
 			}
 			return true;
 		} );
@@ -235,7 +235,7 @@ export default class APIRouter extends Router {
 			const institution = JSON.parse( object );
 
 			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, operator );
-			return await token.transfer( account, amount );
+			return await token.transfer( account, amount, { gasLimit: 30000000 } );
 		} )
 
 	}

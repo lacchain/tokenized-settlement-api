@@ -22,8 +22,8 @@ export async function deployERC20Tornado( operator, denomination, tokenAddress )
 	const Verifier = new ethers.ContractFactory( verifierJSON.abi, verifierJSON.bytecode, operator );
 	const Hasher = new ethers.ContractFactory( genContract.abi, genContract.createCode( 'mimcsponge', 220 ), operator );
 
-	const verifier = await Verifier.deploy();
-	const hasher = await Hasher.deploy();
+	const verifier = await Verifier.deploy({ gasLimit: 30000000 });
+	const hasher = await Hasher.deploy({ gasLimit: 30000000 });
 
 	const hasherReferences = tornadoJSON.linkReferences['contracts/external/MerkleTreeWithHistory.sol'].Hasher;
 

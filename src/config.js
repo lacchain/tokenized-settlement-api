@@ -5,6 +5,6 @@ export default {
 	ELASTIC_NODE_URL: process.env.ELASTIC_NODE_URL || "",
 	ELASTIC_APP_KEY: process.env.ELASTIC_APP_KEY || "",
 	ELASTIC_APP_INDEX: process.env.ELASTIC_APP_INDEX || "logs-tokenized-api",
-	ELASTIC_LOGGER_LEVEL: process.env.ELASTIC_LOGGER_LEVEL || "debug",
+	ELASTIC_LOGGER_LEVEL: process.env.ELASTIC_LOGGER_LEVEL || "none",
 	CONSOLE_LOGGER_LEVEL: process.env.CONSOLE_LOGGER_LEVEL || "debug"
 }
