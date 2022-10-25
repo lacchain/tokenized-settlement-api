@@ -23,8 +23,8 @@ POST http://localhost:8085/connect
 Content-Type: application/json
 
 {
-	"fromAddress": "0x207d481F47Bd65C18B528450620D73a235E7Fb12",
-	"toAddress": "0x95255F2381669E293BA5523aD415050aA1604be2"
+	"fromAddress": "0x690adF0852e1b2b172d056eF02CA320d135C8cfd",
+	"toAddress": "0x9f7DC3Abb7e9838b7012ba1E817E74B461aB2925"
 }
 
 ### Connect institution 2 to Institution 1
@@ -32,16 +32,16 @@ POST http://localhost:8085/connect
 Content-Type: application/json
 
 {
-	"fromAddress": "0x95255F2381669E293BA5523aD415050aA1604be2",
-	"toAddress": "0x207d481F47Bd65C18B528450620D73a235E7Fb12"
+	"fromAddress": "0x9f7DC3Abb7e9838b7012ba1E817E74B461aB2925",
+	"toAddress": "0x690adF0852e1b2b172d056eF02CA320d135C8cfd"
 }
 
 ### Get institution 1 balance
-GET http://localhost:8085/balance/0x207d481F47Bd65C18B528450620D73a235E7Fb12/0x4222ec932c5a68b80e71f4ddebb069fa02518b8a
+GET http://localhost:8085/balance/0x690adF0852e1b2b172d056eF02CA320d135C8cfd/0x4222ec932c5a68b80e71f4ddebb069fa02518b8a
 Content-Type: application/json
 
 ### Get institution 2 balance
-GET http://localhost:8085/balance/0x95255F2381669E293BA5523aD415050aA1604be2/0x4222ec932c5a68b80e71f4ddebb069fa02518b8a
+GET http://localhost:8085/balance/0x9f7DC3Abb7e9838b7012ba1E817E74B461aB2925/0x4222ec932c5a68b80e71f4ddebb069fa02518b8a
 Content-Type: application/json
 
 ### Mint to a institution 1
@@ -49,15 +49,15 @@ POST http://localhost:8085/mint
 Content-Type: application/json
 
 {
-	"tokenAddress": "0x207d481F47Bd65C18B528450620D73a235E7Fb12",
+	"tokenAddress": "0x690adF0852e1b2b172d056eF02CA320d135C8cfd",
 	"amount": 25
 }
 
 ### Get total supply of an institution 1
-GET http://localhost:8085/supply/0x207d481F47Bd65C18B528450620D73a235E7Fb12
+GET http://localhost:8085/supply/0x690adF0852e1b2b172d056eF02CA320d135C8cfd
 
 ### Get total supply of an institution 2
-GET http://localhost:8085/supply/0x95255F2381669E293BA5523aD415050aA1604be2
+GET http://localhost:8085/supply/0x9f7DC3Abb7e9838b7012ba1E817E74B461aB2925
 
 
 ### Deposit indexFrom to indexTo institution
@@ -65,8 +65,8 @@ POST http://localhost:8085/transferInstitution1
 Content-Type: application/json
 
 {
-	"fromAddress": "0x207d481F47Bd65C18B528450620D73a235E7Fb12",
-	"toAddress": "0x95255F2381669E293BA5523aD415050aA1604be2",
+	"fromAddress": "0x690adF0852e1b2b172d056eF02CA320d135C8cfd",
+	"toAddress": "0x9f7DC3Abb7e9838b7012ba1E817E74B461aB2925",
 	"amount": 17
 }
 
@@ -75,27 +75,27 @@ POST http://localhost:8085/transferInstitution2
 Content-Type: application/json
 
 {
-	"tokenAddress": "0x95255F2381669E293BA5523aD415050aA1604be2",
+	"tokenAddress": "0x9f7DC3Abb7e9838b7012ba1E817E74B461aB2925",
 	"deposits": [
 		{
 			"denomination": 10,
-			"preimage": "636a1b925fbbb0c57eef21cae110eaca077f4f29f1c8491c086a815ba346d6c8665c6cb28e4668caa52fb0f167dcafb1ec11a8d57ad7afc9fc657e4340c6",
-			"nullifierHash": "0x114ce06a0e172aeeafa7c92fb6b7ecce9bc604fe20320ac53e29ad7311b36700"
+			"preimage": "187a38eee4329df634dfff6702ae9f35be405d7fe3f250084eb25a3efd14457cdad2ce442c17d9909797b84b7263c5d6a8ee6fa0fe06649e1c5ed8dd3d9d",
+			"nullifierHash": "0x27887700d34008dbf489615bb0a5f7ebc92c6364fd2ab73a777f8eec35a8dc67"
 		},
 		{
 			"denomination": 5,
-			"preimage": "c50a2fa715dd7a65afb663402bc88c0eeb7230aa27d9a44c45a878a036bb721e8ae28a86296078d175481945db630d1f8074f47b2ce4b608e1f4be00f6b9",
-			"nullifierHash": "0x1cea873a02e0803f5940cb5a1c8f279662bc7db2f933807bfc91e058da982516"
+			"preimage": "837e0cadf035eed1871813c55eb526297da3a30e05a3d05ddc7252cb4333b61ec6cfdc7698bf834fde457dc93b262dc7da56d17bf5ee20707764d43162e5",
+			"nullifierHash": "0x2878a42cf13e664738068f6f941765e4dcef65542b29dcaab13e9c7044f5189c"
 		},
 		{
 			"denomination": 1,
-			"preimage": "b6d7e25301860491583d3d444955f67375f9c822d4d52bce5f7212730bb33a648fcbc32e25ea3cb7e41d7aa6112bc7d5052f5ca1bc7174f0d100bb5af5ec",
-			"nullifierHash": "0x0e78164bb5d8e4f790357251a320464167eefaae8c6cba535a54d1d46d528852"
+			"preimage": "8df32825036e997b384b7896e523e082e6b613172e196fae6d2308d0da5f3ae594ff77c611a953cef95e679df8c1c5343b41da58fe36fea47d19edfff9de",
+			"nullifierHash": "0x25a19dde5febb28049df85c729dc2bd1353e5f6f346b8018f7f14647ff8a6ef7"
 		},
 		{
 			"denomination": 1,
-			"preimage": "572ddbc36e39b72f6bae74f621f463c0b818ab594b3fdc7280ac5c55fbd250f381249efbd9c45572d2693251c3edf11f021762787def07bbd4e93163aa6b",
-			"nullifierHash": "0x0376662ec3a1eb30a30cb9d6cab953be83d3e384e14b4a9f4c260c1760a017eb"
+			"preimage": "3f32c285c5c9c5586bdc1803d29c1de872f55f16c3b9f9241c6d00302e63902f9ab8d9d004686075cf014fbafc336394803660754d871a35f05ec12c6eb1",
+			"nullifierHash": "0x23477ec4498312593a2dc284e9842463b4e6fb0d48f11bfdc9b2ed2b79940f51"
 		}
 	]
 }
@@ -105,7 +105,7 @@ POST http://localhost:8085/addCustomer
 Content-Type: application/json
 
 {
-	"tokenAddress": "0x207d481F47Bd65C18B528450620D73a235E7Fb12",
+	"tokenAddress": "0x9f7DC3Abb7e9838b7012ba1E817E74B461aB2925",
 	"account": "0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F"
 }
 
@@ -115,11 +115,11 @@ POST http://localhost:8085/transferCustomer
 Content-Type: application/json
 
 {
-	"tokenAddress": "0x207d481F47Bd65C18B528450620D73a235E7Fb12",
+	"tokenAddress": "0x9f7DC3Abb7e9838b7012ba1E817E74B461aB2925",
 	"account": "0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F",
     "amount": 2
 }
 
 ### Get account balance of institution 2
-GET http://localhost:8085/balance/0xc7961162C6fBE764747258226d8Cb7fb30eeeA40/0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F
+GET http://localhost:8085/balance/0x9f7DC3Abb7e9838b7012ba1E817E74B461aB2925/0x3753Ab418d49B86bb7D65E4e3ed6B42F37f72E0F
 Content-Type: application/json

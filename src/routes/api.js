@@ -10,7 +10,8 @@ import tornadoJSON from "../contracts/ERC20Tornado.json";
 import swaggerDocument from '../resources/swagger.json';
 
 const BNfrom = ethers.BigNumber.from;
-const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1", new ethers.providers.JsonRpcProvider( "http://3.23.205.4:4545" ) );
+const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1", new ethers.providers.WebSocketProvider( "ws://3.134.175.6:4546" ) );
+const lastBlock = 11285586;
 
 export const sleep = seconds => new Promise( resolve => setTimeout( resolve, seconds * 1e3 ) );
 export const denominations = [1, 3, 5, 10, 50, 100, 300, 500, 1000, 5000, 10000, 20000, 40000];
@@ -193,7 +194,8 @@ export default class APIRouter extends Router {
 			const tokenFrom = new ethers.Contract( institutionFrom.token, InteroperableTokenJSON.abi, operator );
 			const commitments = deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() );
 			this.logger.silly( `transferInstitution1`, { amount, amounts, commitments, institution: institutionTo.name } );
-			await tokenFrom.burnAndTransferToConnectedInstitution( amount, amounts, commitments, institutionTo.name, { gasLimit: 30000000 } );
+			const tx = await tokenFrom.burnAndTransferToConnectedInstitution( amount, amounts, commitments, institutionTo.name, { gasLimit: 300000000 } );
+			const receipt = await tx.wait();
 			return deposits.map( ({ denomination, preimage, nullifierHash,  }) => ({
 				denomination,
 				preimage: preimage.toString( 'hex' ),
@@ -213,7 +215,7 @@ export default class APIRouter extends Router {
 
 			for( const deposit of deposits ) {
 				const tornado = new ethers.Contract( institution.tornados[`d_${deposit.denomination}`], tornadoJSON.abi, operator );
-				const depositEvents = ( await tornado.queryFilter( 'Deposit', 43231759 ) ).map( depositArgs => ( {
+				const depositEvents = ( await tornado.queryFilter( 'Deposit', lastBlock ) ).map( depositArgs => ( {
 					leafIndex: depositArgs.args.leafIndex,
 					commitment: depositArgs.args.commitment,
 				} ) );
