@@ -149,7 +149,7 @@
         }
       }
     },
-    "/balance/{token}/{account}": {
+    "/balance/{network}/{token}/{account}": {
       "get": {
         "tags": [
           "Balance"
@@ -170,6 +170,14 @@
         ],
         "parameters": [
           {
+            "name": "network",
+            "description": "Blockchain Network",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "commercial"
+          },
+          {
             "name": "token",
             "description": "InteroperableToken Address",
             "in": "path",
@@ -184,14 +192,6 @@
             "required": true,
             "type": "string",
             "default": "0x4222ec932c5a68b80e71f4ddebb069fa02518b8a"
-          },
-          {
-            "name": "network",
-            "description": "Blockchain Network",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "default": "commercial"
           }
         ],
         "responses": {
