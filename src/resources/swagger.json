@@ -52,6 +52,14 @@
                 "initialSupply": {
                   "type": "integer",
                   "default": 10
+                },
+                "network": {
+                  "type": "string",
+                  "default": "commecial",
+                  "enum": [
+                    "commercial",
+                    "settlement"
+                  ]
                 }
               }
             }
@@ -66,7 +74,8 @@
                 "symbol": "IN1",
                 "tokenAddress": "0x9EA8C207F764C789219cd84b0986e5B2480F0deE",
                 "tornadoAddress": "0xE1c90892DC25598B5493869457eFaccf6BA5B4d6",
-                "totalSupply": "10"
+                "totalSupply": "10",
+                "network": "commercial"
               }
             }
           },
@@ -111,6 +120,14 @@
                 "toAddress": {
                   "type": "string",
                   "default": "0x121A39A5154A5CD852C357D8267928e731F64658"
+                },
+                "network": {
+                  "type": "string",
+                  "default": "commecial",
+                  "enum": [
+                    "commercial",
+                    "settlement"
+                  ]
                 }
               }
             }
@@ -167,6 +184,14 @@
             "required": true,
             "type": "string",
             "default": "0x4222ec932c5a68b80e71f4ddebb069fa02518b8a"
+          },
+          {
+            "name": "network",
+            "description": "Blockchain Network",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "default": "commercial"
           }
         ],
         "responses": {
@@ -219,6 +244,14 @@
                 "amount": {
                   "type": "integer",
                   "default": 1
+                },
+                "network": {
+                  "type": "string",
+                  "default": "commercial",
+                  "enum": [
+                    "commercial",
+                    "settlement"
+                  ]
                 }
               }
             }
@@ -278,6 +311,14 @@
                 "amount": {
                   "type": "integer",
                   "default": 1
+                },
+                "network": {
+                  "type": "string",
+                  "default": "commercial",
+                  "enum": [
+                    "commercial",
+                    "settlement"
+                  ]
                 }
               }
             }
@@ -370,7 +411,15 @@
                     "preimage": "e45b931ffac2deaa6753546510cb501c8797b6bbbad200e4258fe28adf6370a2ad673f0c0f23a6a73d55b42b8db1e35821c00242e1eb120f1238576c0f0e",
                     "nullifierHash": "0x1574388e66f99805b0adcb7aa13b7245e800615b4e1672a5db6ba72363183035"
                   }
-                ]
+                ],
+                "network": {
+                  "type": "string",
+                  "default": "commercial",
+                  "enum": [
+                    "commercial",
+                    "settlement"
+                  ]
+                }
               }
             }
           }
@@ -423,6 +472,14 @@
                 "account": {
                   "type": "string",
                   "default": "0x90ff845f5db553415ce34dd6dd815692a29e6662"
+                },
+                "network": {
+                  "type": "string",
+                  "default": "commercial",
+                  "enum": [
+                    "commercial",
+                    "settlement"
+                  ]
                 }
               }
             }
@@ -480,6 +537,14 @@
                 "account": {
                   "type": "string",
                   "default": "0x5967b9b16024Ffc06Ef25Af6D77de00c5C5D621B"
+                },
+                "network": {
+                  "type": "string",
+                  "default": "commercial",
+                  "enum": [
+                    "commercial",
+                    "settlement"
+                  ]
                 }
               }
             }
