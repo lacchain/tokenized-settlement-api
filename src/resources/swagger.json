@@ -55,7 +55,7 @@
                 },
                 "network": {
                   "type": "string",
-                  "default": "commecial",
+                  "default": "commercial",
                   "enum": [
                     "commercial",
                     "settlement"
