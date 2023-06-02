@@ -10,8 +10,8 @@ import tornadoJSON from "../contracts/ERC20Tornado.json";
 import swaggerDocument from '../resources/swagger.json';
 
 const networks = {
-	commercial: "ws://3.17.191.188:4546",
-	settlement: "ws://3.142.145.202:4546"
+	settlement: "ws://3.17.191.188:4546",
+	commercial: "ws://3.142.145.202:4546"
 };
 
 const BNfrom = ethers.BigNumber.from;
