@@ -15,7 +15,17 @@ const networks = {
 };
 
 const BNfrom = ethers.BigNumber.from;
-const operator = new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1" );
+const operator = {
+		settlement: {
+			wallet: new ethers.Wallet( "6ccfcaa51011057276ef4f574a3186c1411d256e4d7731bdf8743f34e608d1d1" ),
+			address: '0x4222EC932c5a68b80e71F4dDebb069fa02518b8A'
+		},
+		commercial: {
+			wallet: new ethers.Wallet( "06a22b609f10cd8791c87a40f9956c978bbe4be85d2cdcc72f29a30c69147ade" ),
+			address: '0x5C71EEDC29bEad243DE4387B000517613bdf885D'
+		},
+
+};
 const lastBlock = 0;
 
 export const sleep = seconds => new Promise( resolve => setTimeout( resolve, seconds * 1e3 ) );
@@ -46,8 +56,6 @@ export default class APIRouter extends Router {
 	}
 
 	async init() {
-		const operatorAddress = await operator.getAddress();
-
 		const redisClient = redis.createClient( { url: process.env.REDIS_HOST } );
 
 		await redisClient.connect();
@@ -56,10 +64,11 @@ export default class APIRouter extends Router {
 
 		this.post( '/deploy', async req => {
 			const { name, symbol, initialSupply, network } = req.body;
-			const sender = operator.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
+			const sender = operator[network].wallet.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
 
 			if( isNaN( initialSupply ) ) throw new Error( "initialSupply is not a number" );
 
+			const operatorAddress = operator[network].address;
 			const InteroperableToken = new ethers.ContractFactory( InteroperableTokenJSON.abi, InteroperableTokenJSON.bytecode, sender );
 			const token = await InteroperableToken.deploy( name, symbol, name, `0x${initialSupply.toString( 16 )}`, operatorAddress, operatorAddress, operatorAddress, operatorAddress, operatorAddress, { gasLimit: 30000000 } );
 			await token.deployed().catch( error => {
@@ -96,7 +105,7 @@ export default class APIRouter extends Router {
 
 		this.post( '/connect', async req => {
 			const { fromAddress, toAddress, network } = req.body;
-			const sender = operator.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
+			const sender = operator[network].wallet.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
 
 			const from = await redisClient.get( fromAddress );
 			const to = await redisClient.get( toAddress );
@@ -117,7 +126,7 @@ export default class APIRouter extends Router {
 		this.get( '/supply/:network/:tokenAddress', async req => {
 			const { tokenAddress, network } = req.params;
 
-			const sender = operator.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
+			const sender = operator[network].wallet.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
 
 			const object = await redisClient.get( tokenAddress );
 			if( !object ) throw new Error( "Invalid token address" );
@@ -133,7 +142,7 @@ export default class APIRouter extends Router {
 
 		this.post( '/mint', async req => {
 			const { tokenAddress, amount, network } = req.body;
-			const sender = operator.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
+			const sender = operator[network].wallet.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
 
 			if( isNaN( amount ) ) throw new Error( "amount is not a number" );
 
@@ -143,6 +152,7 @@ export default class APIRouter extends Router {
 			const institution = JSON.parse( object );
 			const token = new ethers.Contract( institution.token, InteroperableTokenJSON.abi, sender );
 
+			const operatorAddress = operator[network].address;
 			await token.mint( operatorAddress, `0x${amount.toString( 16 )}`, { gasLimit: 30000000 } );
 
 			await sleep(3);
@@ -155,7 +165,7 @@ export default class APIRouter extends Router {
 
 		this.get( '/balance/:network/:tokenAddress/:accountAddress', async req => {
 			const { tokenAddress, accountAddress, network } = req.params;
-			const sender = operator.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
+			const sender = operator[network].wallet.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
 
 			const object = await redisClient.get( tokenAddress );
 			if( !object ) throw new Error( "Invalid token address" );
@@ -171,7 +181,7 @@ export default class APIRouter extends Router {
 
 		this.post( '/addCustomer', async req => {
 			const { tokenAddress, account, network } = req.body;
-			const sender = operator.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
+			const sender = operator[network].wallet.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
 
 			const object = await redisClient.get( tokenAddress );
 			if( !object ) throw new Error( "Invalid token address" );
@@ -190,7 +200,7 @@ export default class APIRouter extends Router {
 
 		this.post( '/transferInstitution1', async req => {
 			const { fromAddress, toAddress, amount, network } = req.body;
-			const sender = operator.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
+			const sender = operator[network].wallet.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
 
 			if( isNaN( amount ) ) throw new Error( "amount is not a number" );
 
@@ -209,7 +219,9 @@ export default class APIRouter extends Router {
 			const commitments = deposits.map(({ commitment }) => BNfrom( commitment ).toHexString() );
 			this.logger.silly( `transferInstitution1`, { amount, amounts, commitments, institution: institutionTo.name } );
 			const tx = await tokenFrom.burnAndTransferToConnectedInstitution( amount, amounts, commitments, institutionTo.name, { gasLimit: 300000000 } );
-			const receipt = await tx.wait();
+
+			await tx.wait();
+
 			return deposits.map( ({ denomination, preimage, nullifierHash,  }) => ({
 				denomination,
 				preimage: preimage.toString( 'hex' ),
@@ -219,7 +231,7 @@ export default class APIRouter extends Router {
 
 		this.post( '/transferInstitution2', async req => {
 			const { tokenAddress, deposits, network } = req.body;
-			const sender = operator.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
+			const sender = operator[network].wallet.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
 
 			const object = await redisClient.get( tokenAddress );
 			if( !object ) throw new Error( "Invalid token address" );
@@ -234,6 +246,7 @@ export default class APIRouter extends Router {
 					leafIndex: depositArgs.args.leafIndex,
 					commitment: depositArgs.args.commitment,
 				} ) );
+				const operatorAddress = operator[network].address;
 				const { root, proof } = await generateProof( Buffer.from( deposit.preimage, 'hex' ), operatorAddress, MERKLE_TREE_HEIGHT, depositEvents, circuit, provingKey );
 				const rootHex = BNfrom( root ).toHexString();
 				await tornado.withdraw( proof, rootHex, deposit.nullifierHash, operatorAddress, ethers.constants.AddressZero, 0, 0, { gasLimit: 30000000 } );
@@ -243,7 +256,7 @@ export default class APIRouter extends Router {
 
 		this.post( '/transferCustomer', async req => {
 			const { tokenAddress, amount, account, network } = req.body;
-			const sender = operator.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
+			const sender = operator[network].wallet.connect( new ethers.providers.WebSocketProvider( networks[network] || networks.commercial ) );
 
 			if( isNaN( amount ) ) throw new Error( "amount is not a number" );
 
